@@ -1,0 +1,1 @@
+# odoo-mass_mailing
