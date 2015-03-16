@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        
+        <template id="sudo_ddmenu" inherit_id="smart_common.smartbar_default"  name="Sudo Menu">
+                <xpath expr="//ul[@id='smart_user_ddmenu']" position="inside">
+                      <li><a href="/sudo_login" groups="base.group_smart_advisor">Sudo</a></li>
+                </xpath>            
+        </template>
+        
+
+
+    </data>
+</openerp>
