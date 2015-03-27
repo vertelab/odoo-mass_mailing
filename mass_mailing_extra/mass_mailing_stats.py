@@ -32,19 +32,23 @@ _logger = logging.getLogger(__name__)
 
 
 class MailMailStats(models.Model):
-
     _inherit = "mail.mail.statistics"
 
     @api.one
     def _model_name(self):
-        model = self.env[self.model].browse(self.res_id) if self.model else False
+        if self.env.get('self.model'):
+            model = self.env[self.model].browse(self.res_id) if self.model else False
         self.model_name = model.name if model else _('None')
 
     model_name = fields.Char(compute="_model_name")
+    
+    model_id = fields.Many2one(comodel_name="ir.model")
+    
 
     @api.one
     def _model_id(self):
-        model = self.env[self.model].browse(self.res_id) if self.model else False
+        if self.env.get('self.model'):
+            model = self.env[self.model].browse(self.res_id) if self.model else False
         self.model_id = model if model else False
 
     model_id = fields.Many2one(comode_name="self.model",compute="_model_id")
