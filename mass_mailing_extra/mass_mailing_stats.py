@@ -35,20 +35,16 @@ class MailMailStats(models.Model):
     _inherit = "mail.mail.statistics"
 
     @api.one
+#    @api.dependents('mail.mail.statistics.model','mail.mail.statistics.res_id')
     def _model_name(self):
-        if self.env.get('self.model'):
-            model = self.env[self.model].browse(self.res_id) if self.model else False
+        model = self.env[self.model].browse(self.res_id) if self.model else False
         self.model_name = model.name if model else _('None')
 
-    model_name = fields.Char(compute="_model_name")
+    model_name = fields.Char(compute="_model_name",) # store=True)
     
-    model_id = fields.Many2one(comodel_name="ir.model")
-    
-
     @api.one
     def _model_id(self):
-        if self.env.get('self.model'):
-            model = self.env[self.model].browse(self.res_id) if self.model else False
+        model = self.env[self.model].browse(self.res_id) if self.model else False
         self.model_id = model if model else False
 
     model_id = fields.Many2one(comode_name="self.model",compute="_model_id")

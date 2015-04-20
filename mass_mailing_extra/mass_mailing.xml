@@ -3,62 +3,34 @@
     <data>
        
 
-        <!--  MAIL MAIL STATISTICS !-->
-        <record model="ir.ui.view" id="view_mail_mail_statistics_search">
+        <record id="view_mail_mail_statistics_search" model="ir.ui.view">
             <field name="name">mail.mail.statistics.search</field>
             <field name="model">mail.mail.statistics</field>
+            <field name="inherit_id" ref="mass_mailing.view_mail_mail_statistics_search"/>
             <field name="arch" type="xml">
-               <search string="Mail Statistics">
-                    <field name="mail_mail_id_int"/>
-                    <field name="message_id"/>
-                    <field name="mass_mailing_id"/>
-                </search>
+                <field name="mass_mailing_id" position="after">
+                    <field name="model_name" />
+                </field>
             </field>
         </record>
-
-        <record model="ir.ui.view" id="view_mail_mail_statistics_tree">
+        
+        <record id="view_mail_mail_statistics_tree" model="ir.ui.view">
             <field name="name">mail.mail.statistics.tree</field>
             <field name="model">mail.mail.statistics</field>
+            <field name="inherit_id" ref="mass_mailing.view_mail_mail_statistics_tree"/>
             <field name="arch" type="xml">
-                <tree string="Mail Statistics">
-                    <field name="mail_mail_id_int"/>
-                    <field name="message_id"/>
-                    <field name="sent"/>
-                    <field name="exception"/>
-                    <field name="opened"/>
-                    <field name="replied"/>
-                    <field name="bounced"/>
-                </tree>
+                <field name="sent" position="before">
+                    <field name="model_name" />
+                </field>
+                <field name="message_id" position="replace">
+                </field>
+                <field name="bounced" position="after">
+                    <field name="message_id" />
+                </field>
+                
             </field>
         </record>
-
-        <record model="ir.ui.view" id="view_mail_mail_statistics_form">
-            <field name="name">mail.mail.statistics.form</field>
-            <field name="model">mail.mail.statistics</field>
-            <field name="arch" type="xml">
-                <form string="Mail Statistics">
-                    <group>
-                        <group>
-                            <field name="mail_mail_id"/>
-                            <field name="mail_mail_id_int"/>
-                            <field name="message_id"/>
-                            <field name="exception"/>
-                            <field name="sent"/>
-                            <field name="opened"/>
-                            <field name="replied"/>
-                            <field name="bounced"/>
-                        </group>
-                        <group>
-                            <field name="mass_mailing_id"/>
-                            <field name="mass_mailing_campaign_id"/>
-                            <field name="model"/>
-                            <field name="res_id"/>
-                        </group>
-                    </group>
-                </form>
-            </field>
-        </record>
-
+        
   
     </data>
 </openerp>
