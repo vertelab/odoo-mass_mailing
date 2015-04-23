@@ -34,17 +34,40 @@ _logger = logging.getLogger(__name__)
 class MailMailStats(models.Model):
     _inherit = "mail.mail.statistics"
 
-    @api.one
-#    @api.dependents('mail.mail.statistics.model','mail.mail.statistics.res_id')
-    def _model_name(self):
-        model = self.env[self.model].browse(self.res_id) if self.model else False
-        self.model_name = model.name if model else _('None')
 
-    model_name = fields.Char(compute="_model_name",) # store=True)
+                
+    @api.onchange('model','res_id')
+    def _model_change(self):
+        if self.model and self.res_id and self.env[self.model].browse(self.res_id):
+            self.model_record = self.env[self.model].browse(self.res_id)
+
+    #~ @api.model
+    #~ def _select_objects(self):
+        #~ #_logger.info('Select %s' % [(m.model, m.name) for m in self.env['ir.model'].search([])])
+        #~ return [(m.model, m.name) for m in self.env['ir.model'].search([])] + [('', '')]
+    #~ id_object = fields.Selection(selection='_select_objects',string='Model',)
+    
+
+    @api.one
+    def _model_record(self):
+        if self.model and self.res_id and self.env[self.model].browse(self.res_id):
+            self.model_record = self.env[self.model].browse(self.res_id)
+
+    @api.model
+    def _reference_models(self):
+        models = self.env['ir.model'].search([('state', '!=', 'manual')])
+#        return self.env[self.model].browse(self.res_id)
+        return [(model.model, model.name)
+                for model in models
+                if not model.model.startswith('ir.')]
+    model_record = fields.Reference(string="Record",selection="_reference_models",compute="_model_record")
+    
+class res_partner(models.Model):
+    _inherit = "res.partner"
     
     @api.one
-    def _model_id(self):
-        model = self.env[self.model].browse(self.res_id) if self.model else False
-        self.model_id = model if model else False
+    def _mass_mail_count(self): 
+        self.mass_mail_count = len(self.env['mail.mail.statistics'].search([('res_id','=',self.id),('model','=','res.partner')]))
+    mass_mail_count = fields.Integer(compute="_mass_mail_count")
 
-    model_id = fields.Many2one(comode_name="self.model",compute="_model_id")
+    
