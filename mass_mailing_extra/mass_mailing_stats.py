@@ -35,7 +35,7 @@ class MailMailStats(models.Model):
     _inherit = "mail.mail.statistics"
 
 
-                
+
     @api.onchange('model','res_id')
     def _model_change(self):
         if self.model and self.res_id and self.env[self.model].browse(self.res_id):
@@ -46,7 +46,7 @@ class MailMailStats(models.Model):
         #~ #_logger.info('Select %s' % [(m.model, m.name) for m in self.env['ir.model'].search([])])
         #~ return [(m.model, m.name) for m in self.env['ir.model'].search([])] + [('', '')]
     #~ id_object = fields.Selection(selection='_select_objects',string='Model',)
-    
+
 
     @api.one
     def _model_record(self):
@@ -61,13 +61,41 @@ class MailMailStats(models.Model):
                 for model in models
                 if not model.model.startswith('ir.')]
     model_record = fields.Reference(string="Record",selection="_reference_models",compute="_model_record")
-    
+
+    @api.one
+    def set_page_read(mail_mail_statistics_id):
+        pass
+
+class MassMailing(models.Model):
+    _inherit = 'mail.mass_mailing'
+
+    page = fields.Many2many(comodel_name='ir.ui.view', string='Page')
+
+
 class res_partner(models.Model):
     _inherit = "res.partner"
-    
+
     @api.one
-    def _mass_mail_count(self): 
+    def _mass_mail_count(self):
         self.mass_mail_count = len(self.env['mail.mail.statistics'].search([('res_id','=',self.id),('model','=','res.partner')]))
     mass_mail_count = fields.Integer(compute="_mass_mail_count")
 
-    
+
+class massMailRead(http.Controller):
+
+    @http.route('/mail/read_letter/<int:mail_mail_statistics_id>/letter.html', type='http', auth='none')
+    def read_letter(self, mail_mail_statistics_id, **post):
+        mail_mail_stats = request.env['mail.mail.statistics'].sudo().search([('mail_mail_id_int', '=', mail_mail_statistics_id)])
+        mail_mail_stats.set_opened(mail_mail_ids=[mail_mail_stats])
+        response = werkzeug.wrappers.Response()
+        response.mimetype = 'text/html'
+        response.data = mail_mail_stats.mass_mailing_id.body_html
+        return response
+
+    @http.route('/mail/page/<int:mail_mail_statistics_id>/index.html', type='http', auth='none')
+    def read_page(self, mail_mail_statistics_id, **post):
+        mail_mail_stats = request.env['mail.mail.statistics'].browse(int(mail_mail_statistics_id))
+        mail_mail_stats.set_page_read(mail_mail_statistics_id) #new method that calculate who read this page
+        template = request.env['mail.mail.statistics'].browse(mail_mail_statistics_id).mass_mailing_id.page.xml_id
+        return request.render(template, {'path': '/mail/page/%s/index.html' %mail_mail_statistics_id})
+
