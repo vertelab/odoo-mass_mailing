@@ -23,7 +23,7 @@
             </field>
         </record>
 
- 
+
         <record id="crm_lead_view_buttons" model="ir.ui.view">
             <field name="name">crm.lead.view.buttons</field>
             <field name="model">crm.lead</field>
@@ -32,11 +32,11 @@
             <field name="groups_id" eval="[(4, ref('base.group_sale_salesman'))]"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@name='buttons']" position="inside">
-                    <button class="oe_inline oe_stat_button" type="action" name="%(mass_mailing_crm.mass_mail_stat)d" 
-                        attrs="{'invisible': [('mass_mail_count', '<', 1)]}"
+                    <button class="oe_inline oe_stat_button" type="action" name="%(mass_mailing_crm.mass_mail_stat)d"
+                        attrs="{'invisible': [('mass_mail_count', '&lt;', 1)]}"
                         icon="fa-strikethrough">
                         <field string="Mass Mail" name="mass_mail_count" widget="statinfo"/>
-                    </button>     
+                    </button>
                 </xpath>
             </field>
         </record>

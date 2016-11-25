@@ -30,7 +30,7 @@
 """,
     'author': 'Vertel AB',
     'website': 'https://vertel.se',
-    'depends': ['mass_mailing',],
+    'depends': ['mass_mailing', 'website'],
     'data': [
         'mass_mailing.xml',
     ],

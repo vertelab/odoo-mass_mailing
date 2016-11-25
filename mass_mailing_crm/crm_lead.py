@@ -39,4 +39,4 @@ class crm_lead(models.Model):
     def _mass_mail_count(self):
         self.mass_mail_count = len(self.env['mail.mail.statistics'].select(['&',('res_id','=',self.id),('model','=','crm.lead')]))
 
-    mass_mail_count = fields.Float('Mass Mail Count',compute=lambda self: len(self.env['mail.mail.statistics'].select(['&',('res_id','=',self.id),('model','=','crm.lead')]))
+    mass_mail_count = fields.Float('Mass Mail Count',compute=lambda self: len(self.env['mail.mail.statistics'].select(['&',('res_id','=',self.id),('model','=','crm.lead')])))
