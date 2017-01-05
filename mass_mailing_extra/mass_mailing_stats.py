@@ -76,7 +76,7 @@ class MassMailing(models.Model):
     def _visited_us(self):
         self.visited_us = self.env['mail.mail.statistics'].search_count([('visited_us', '!=', False)])
         statistics_count = self.env['mail.mail.statistics'].search_count([])
-        if statistics_count != 0
+        if statistics_count != 0:
             self.visited_us_ratio = self.visited_us / statistics_count * 100.0
         else:
             self.visited_us_ratio = 0
