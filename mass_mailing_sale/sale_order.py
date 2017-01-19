@@ -20,23 +20,12 @@
 ##############################################################################
 from openerp import models, fields, api, _
 from openerp.exceptions import except_orm, Warning, RedirectWarning
-from openerp import http
-from openerp.http import request
-from openerp import SUPERUSER_ID
-from datetime import datetime
-import werkzeug
-import pytz
-import re
 
 import logging
 _logger = logging.getLogger(__name__)
 
 
-class crm_lead(models.Model):
-    _inherit = 'crm.lead'
+class sale_order(models.Model):
+    _inherit = 'sale.order'
 
-    @api.one
-    def _mass_mail_count(self):
-        self.mass_mail_count = len(self.env['mail.mail.statistics'].select(['&',('res_id','=',self.id),('model','=','crm.lead')]))
-
-    mass_mail_count = fields.Float('Mass Mail Count',compute=lambda self: len(self.env['mail.mail.statistics'].select(['&',('res_id','=',self.id),('model','=','crm.lead')])))
+    _mail_mass_mailing = _('Sale Order')
