@@ -2,7 +2,7 @@
 ##############################################################################
 #
 # OpenERP, Open Source Management Solution, third party addon
-# Copyright (C) 2004-2017 Vertel AB (<http://vertel.se>).
+# Copyright (C) 2004-2015 Vertel AB (<http://vertel.se>).
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -19,6 +19,20 @@
 #
 ##############################################################################
 
-import mass_mailing_stats
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
 
+{
+    'name': 'Mass Mailing Unsanitized HTML',
+    'version': '1.0',
+    'category': 'Tools',
+    'description': """
+Unsanitized html tags in mass_mailing
+=====================================
+""",
+    'author': 'Vertel AB',
+    'website': 'https://vertel.se',
+    'depends': ['mass_mailing'],
+    'data': [],
+    'installable': True,
+    'auto_install': False,
+}
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

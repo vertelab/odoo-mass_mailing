@@ -19,6 +19,19 @@
 #
 ##############################################################################
 
-import mass_mailing_stats
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+from openerp import models, fields, api, _
+from openerp.exceptions import except_orm, Warning, RedirectWarning
 
+import logging
+_logger = logging.getLogger(__name__)
+
+
+class MassMailing(models.Model):
+    _inherit = "mail.mass_mailing"
+
+    body_html = fields.Html(string='Body', sanitize=False)
+
+class mail_compose_message(models.TransientModel):
+    _inherit = "mail.compose.message"
+
+    body = fields.Html(string='Contents', help='Unsanitized HTML contents', sanitize=False)

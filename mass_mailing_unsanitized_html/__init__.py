@@ -19,6 +19,6 @@
 #
 ##############################################################################
 
-import mass_mailing_stats
+import mass_mailing
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
 
