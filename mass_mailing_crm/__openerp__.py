@@ -29,6 +29,7 @@
 ====================================
 """,
     'author': 'Vertel AB',
+    'license': 'AGPL-3',
     'website': 'https://vertel.se',
     'depends': ['mass_mailing','crm'],
     'data': [

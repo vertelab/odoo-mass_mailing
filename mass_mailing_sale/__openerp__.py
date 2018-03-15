@@ -27,6 +27,7 @@ Add sale order list in mailing model
 ====================================
 """,
     'author': 'Vertel AB',
+    'license': 'AGPL-3',
     'website': 'https://vertel.se',
     'depends': ['mass_mailing','sale'],
     'data': [
