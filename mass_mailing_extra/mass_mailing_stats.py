@@ -100,7 +100,7 @@ class MailMail(models.Model):
     def send_get_mail_body(self, mail, partner=None):
         """ Override to add the full website version URL to the body. """
         body = super(MailMail, self).send_get_mail_body(mail, partner=partner)
-        return body.replace('$website', _('<a href="%s/mail/page/%s/index.html">View Web Version</a>') %(self.env['ir.config_parameter'].get_param('web.base.url'), mail.id))
+        return body.replace('$website_url', _('<a href="%s/mail/page/%s/index.html">View Web Version</a>') %(self.env['ir.config_parameter'].get_param('web.base.url'), mail.id))
 
 
 class massMailRead(http.Controller):
@@ -131,7 +131,7 @@ class massMailRead(http.Controller):
     def read_page(self, mail_mail_statistics_id, **post):
         mail_mail_stats = request.env['mail.mail.statistics'].sudo().search([('mail_mail_id_int', '=', mail_mail_statistics_id)])
         mail_mail_stats.visited_us = fields.Datetime.now()
-        return mail_mail_stats.mass_mailing_id.body_html.replace('$website', '')
+        return mail_mail_stats.mass_mailing_id.body_html.replace('$website_url', '')
         # ~ mail_mail_stats.set_page_read(mail_mail_ids=[mail_mail_stats])
         # ~ template = mail_mail_stats.mass_mailing_id.page.xml_id
         # ~ return request.website.render(template, {'path': '/mail/page/%s/index.html' %mail_mail_stats.mail_mail_id_int})
