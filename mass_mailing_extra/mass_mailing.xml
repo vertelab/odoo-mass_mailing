@@ -66,11 +66,13 @@
             <field name="model">mail.mass_mailing</field>
             <field name="inherit_id" ref="mass_mailing.view_mail_mass_mailing_form"/>
             <field name="arch" type="xml">
+<!--
                 <group position="after">
                     <group>
                         <field name="page"/>
                     </group>
                 </group>
+-->
                 <div class="oe_button_box pull-right" position="inside">
                     <button name="%(mass_mailing.action_view_mail_mail_statistics_mailing)d"
                             context="{'search_default_filter_visited_us': True}"

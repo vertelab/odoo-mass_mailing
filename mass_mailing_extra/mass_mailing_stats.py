@@ -70,7 +70,7 @@ class MailMailStats(models.Model):
 class MassMailing(models.Model):
     _inherit = 'mail.mass_mailing'
 
-    page = fields.Many2one(comodel_name='ir.ui.view', string='Page')
+    # ~ page = fields.Many2one(comodel_name='ir.ui.view', string='Page')
 
     @api.one
     def _visited_us(self):
@@ -91,6 +91,16 @@ class res_partner(models.Model):
     def _mass_mail_count(self):
         self.mass_mail_count = len(self.env['mail.mail.statistics'].search([('res_id','=',self.id),('model','=','res.partner')]))
     mass_mail_count = fields.Integer(compute="_mass_mail_count")
+
+
+class MailMail(models.Model):
+    _inherit = 'mail.mail'
+
+    @api.model
+    def send_get_mail_body(self, mail, partner=None):
+        """ Override to add the full website version URL to the body. """
+        body = super(MailMail, self).send_get_mail_body(mail, partner=partner)
+        return body.replace('$website', _('<a href="%s/mail/page/%s/index.html">View Web Version</a>') %(self.env['ir.config_parameter'].get_param('web.base.url'), mail.id))
 
 
 class massMailRead(http.Controller):
@@ -120,6 +130,8 @@ class massMailRead(http.Controller):
     @http.route('/mail/page/<int:mail_mail_statistics_id>/index.html', type='http', auth='none', website=True)
     def read_page(self, mail_mail_statistics_id, **post):
         mail_mail_stats = request.env['mail.mail.statistics'].sudo().search([('mail_mail_id_int', '=', mail_mail_statistics_id)])
-        mail_mail_stats.set_page_read(mail_mail_ids=[mail_mail_stats])
-        template = mail_mail_stats.mass_mailing_id.page.xml_id
-        return request.website.render(template, {'path': '/mail/page/%s/index.html' %mail_mail_stats.mail_mail_id_int})
+        mail_mail_stats.visited_us = fields.Datetime.now()
+        return mail_mail_stats.mass_mailing_id.body_html.replace('$website', '')
+        # ~ mail_mail_stats.set_page_read(mail_mail_ids=[mail_mail_stats])
+        # ~ template = mail_mail_stats.mass_mailing_id.page.xml_id
+        # ~ return request.website.render(template, {'path': '/mail/page/%s/index.html' %mail_mail_stats.mail_mail_id_int})
