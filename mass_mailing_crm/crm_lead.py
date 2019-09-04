@@ -37,6 +37,6 @@ class crm_lead(models.Model):
 
     @api.one
     def _mass_mail_count(self):
-        self.mass_mail_count = len(self.env['mail.mail.statistics'].select(['&',('res_id','=',self.id),('model','=','crm.lead')]))
-
-    mass_mail_count = fields.Float('Mass Mail Count',compute=lambda self: len(self.env['mail.mail.statistics'].search(['&',('res_id','=',self.id),('model','=','crm.lead')])))
+        self.mass_mail_count = self.env['mail.mail.statistics'].search_count(['&',('res_id','=',self.id),('model','=','crm.lead')])
+    
+    mass_mail_count = fields.Integer('Mass Mail Count', compute='_mass_mail_count')

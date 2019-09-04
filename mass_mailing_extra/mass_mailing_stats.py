@@ -89,7 +89,7 @@ class res_partner(models.Model):
 
     @api.one
     def _mass_mail_count(self):
-        self.mass_mail_count = len(self.env['mail.mail.statistics'].search([('res_id','=',self.id),('model','=','res.partner')]))
+        self.mass_mail_count = self.env['mail.mail.statistics'].search_count([('res_id','=',self.id),('model','=','res.partner')])
     mass_mail_count = fields.Integer(compute="_mass_mail_count")
 
 
