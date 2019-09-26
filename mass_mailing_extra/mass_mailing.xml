@@ -54,9 +54,16 @@
             <field name="inherit_id" ref="base.view_partner_form" />
             <field name="model">res.partner</field>
             <field name="arch" type="xml">
+                <!-- 2019-09-25
+                     <field string="Mass mail" name="mass_mail_count" widget="statinfo" />
+                -->
                 <xpath expr="//div[@name='buttons']" position="inside">
                     <button class="oe_inline oe_stat_button" type="action" name="%(mass_mailing.action_view_mail_mail_statistics)d" context="{'search_default_model': 'res.partner', 'default_model': 'res.partner','search_default_res_id': active_id, 'default_res_id': active_id}" icon="fa-list">
-                        <field string="Mass mail" name="mass_mail_count" widget="statinfo" />
+                        <div>
+                            <strong>xxxx</strong>
+                            <br />
+                            Massmail
+                        </div>
                     </button>
                 </xpath>
             </field>
@@ -64,20 +71,18 @@
         <record id="view_mail_mass_mailing_form" model="ir.ui.view">
             <field name="name">mail.mass_mailing.form</field>
             <field name="model">mail.mass_mailing</field>
-            <field name="inherit_id" ref="mass_mailing.view_mail_mass_mailing_form"/>
+            <field name="inherit_id" ref="mass_mailing.view_mail_mass_mailing_form" />
             <field name="arch" type="xml">
-<!--
-                <group position="after">
-                    <group>
-                        <field name="page"/>
-                    </group>
-                </group>
--->
+                <!--
+                     <group position="after">
+                     <group>
+                     <field name="page"/>
+                     </group>
+                     </group>
+                -->
                 <div class="oe_button_box pull-right" position="inside">
-                    <button name="%(mass_mailing.action_view_mail_mail_statistics_mailing)d"
-                            context="{'search_default_filter_visited_us': True}"
-                            type="action" class="oe_stat_button">
-                        <field name="visited_us_ratio" string="Visited Us" widget="percentpie"/>
+                    <button name="%(mass_mailing.action_view_mail_mail_statistics_mailing)d" context="{'search_default_filter_visited_us': True}" type="action" class="oe_stat_button">
+                        <field name="visited_us_ratio" string="Visited Us" widget="percentpie" />
                     </button>
                 </div>
             </field>
@@ -85,13 +90,13 @@
         <record model="ir.ui.view" id="view_mail_mail_statistics_search">
             <field name="name">mail.mail.statistics.search.inherit</field>
             <field name="model">mail.mail.statistics</field>
-            <field name="inherit_id" ref="mass_mailing.view_mail_mail_statistics_search"/>
+            <field name="inherit_id" ref="mass_mailing.view_mail_mail_statistics_search" />
             <field name="arch" type="xml">
                 <filter string="Replied" position="after">
-                    <filter string="Visited" name="filter_visited_us" domain="[('visited_us', '!=', False)]"/>
+                    <filter string="Visited" name="filter_visited_us" domain="[('visited_us', '!=', False)]" />
                 </filter>
                 <group string="Group By" position="inside">
-                    <filter string="Visited Us" name="group_visited_us" context="{'group_by': 'visited_us:day'}"/>
+                    <filter string="Visited Us" name="group_visited_us" context="{'group_by': 'visited_us:day'}" />
                 </group>
             </field>
         </record>
