@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- landing page -->
+        <template id="mail" name="Mail page">
+            <t t-call="website.layout">
+                <div id="email_designer" class="mb32">
+                    <div class="col-sm-offset-4">
+                        <div id="email_body_html" class="o_mail_body">
+                            <div t-field="mail.body_html" />
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+    </data>
+</openerp>
