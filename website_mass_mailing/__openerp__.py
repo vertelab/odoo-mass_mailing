@@ -19,13 +19,13 @@
 #
 ##############################################################################
 
-
+# ~ [1927] Nyhetsbrev - Funktion för att läsa nyhetbrev när det inte fungerar i mailklienten
 {
     'name': 'Website Mass Mailing',
     'version': '8.0.1.0',
     'category': 'Tools',
     'description': """
-* Mass mail for view i browser
+* Mass mail to partners, for view i browser
 ====================================
 """,
     'author': 'Vertel AB',

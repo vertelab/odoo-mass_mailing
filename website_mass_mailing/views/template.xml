@@ -2,12 +2,27 @@
 <openerp>
     <data>
         <!-- landing page -->
+        <!-- [1927] Nyhetsbrev - Funktion för att läsa nyhetbrev när det inte fungerar i mailklienten -->
         <template id="mail" name="Mail page">
             <t t-call="website.layout">
                 <div id="email_designer" class="mb32">
-                    <div class="col-sm-offset-4">
-                        <div id="email_body_html" class="o_mail_body">
-                            <div t-field="mail.body_html" />
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div>
+                                    <p />
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div id="email_body_html" class="o_mail_body">
+                                    <div t-field="mail.body_html" />
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div>
+                                    <p />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
