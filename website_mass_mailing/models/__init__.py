@@ -19,24 +19,6 @@
 #
 ##############################################################################
 
-# ~ [1927] Nyhetsbrev - Funktion för att läsa nyhetsbrev när det inte fungerar i mailklienten
-{
-    'name': 'Website Mass Mailing',
-    'version': '8.0.1.1',
-    'category': 'Tools',
-    'description': """
-* Mass mail to partners, for view i browser
-====================================
-""",
-    'author': 'Vertel AB',
-    'license': 'AGPL-3',
-    'website': 'https://vertel.se',
-    'depends': ['mass_mailing','website'],
-    'data': [
-        'views/template.xml',
-        'views/mass_mailing.xml',
-    ],
-    'installable': True,
-    'auto_install': True,
-}
+import mass_mailing
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+

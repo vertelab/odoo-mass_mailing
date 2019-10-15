@@ -35,6 +35,46 @@ _logger = logging.getLogger(__name__)
 
 class website_massmailing(http.Controller):
 
-    @http.route(['/mass_mailing/<model("mail.mass_mailing"):mail>'], type='http', auth="public", website=True)
-    def view_mail(self, mail,**post):
-        return request.render('website_mass_mailing.mail', { 'mail':mail })
+    @http.route(['/mass_mailing/<int:mail_id>/token/<token>'], type='http', auth='public', website=True)
+    def view_mail_token(self, mail_id, token,**post):
+        mail = request.env['mail.mass_mailing'].sudo().browse(mail_id)
+        if token == mail.token:
+            return request.render('website_mass_mailing.mail', { 'mail':mail })
+        else:
+            return request.website.render('website.403', {})
+
+    @http.route(['/mass_mailing/<int:mail_stat_id>/<token>/index.html'], type='http', auth='public', website=True)
+    def view_mail_stat(self, mail_stat_id, token,**post):
+        mail_mail_stats = request.env['mail.mail.statistics'].sudo().browse(mail_stat_id)
+        mail_mail_stats.set_opened(mail_mail_ids=[mail_mail_stats])
+
+        if token == mail_mail_stats.mass_mailing_id.token:
+            return request.render('website_mass_mailing.mail', { 'mail':mail_mail_stats.mass_mailing_id })
+        else:
+            return request.website.render('website.403', {})
+
+    @http.route('/mass_mailing/read_letter/<int:mail_mail_statistics_id>/letter.html', type='http', auth='none', website=True)
+    def read_letter(self, mail_mail_statistics_id, **post):
+        mail_mail_stats = request.env['mail.mail.statistics'].sudo().search([('mail_mail_id_int', '=', mail_mail_statistics_id)])
+        mail_mail_stats.set_opened(mail_mail_ids=[mail_mail_stats])
+        template_data = request.env['email.template'].sudo().render_template(mail_mail_stats.mass_mailing_id.body_html, 'mail.mail.statistics', mail_mail_stats.id) #(template, model, record.id)
+        response = werkzeug.wrappers.Response()
+        response.mimetype = 'text/html'
+        response.data = '''<!doctype html>
+        <html lang="sv-se">
+            <head>
+                <meta charset="utf-8" />
+                <title>''' + mail_mail_stats.mass_mailing_id.name + '''</title>
+                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+            </head>
+            <body>
+        ''' + template_data + '''
+                <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"/>
+            </body>
+        </html>
+        '''
+        return response
+
+
+
+

@@ -55,6 +55,7 @@
             <field name="model">res.partner</field>
             <field name="arch" type="xml">
                 <!-- 2019-09-25
+                     [1878] Prestanda tester - Tar för lång tid att öppna kundkortet III
                      <field string="Mass mail" name="mass_mail_count" widget="statinfo" />
                 -->
                 <xpath expr="//div[@name='buttons']" position="inside">

@@ -2,7 +2,7 @@
 <openerp>
     <data>
         <!-- landing page -->
-        <!-- [1927] Nyhetsbrev - Funktion för att läsa nyhetbrev när det inte fungerar i mailklienten -->
+        <!-- [1927] Nyhetsbrev - Funktion för att läsa nyhetsbrev när det inte fungerar i mailklienten -->
         <template id="mail" name="Mail page">
             <t t-call="website.layout">
                 <div id="email_designer" class="mb32">
