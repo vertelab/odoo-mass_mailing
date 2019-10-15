@@ -26,7 +26,10 @@ import string
 import logging
 _logger = logging.getLogger(__name__)
 
+# ~ [2221] Nyhetsbrev - Länk till webbaserat nyhetsbrev
 # ~ [2222] Nyhetsbrev - Token-skydd till webbaserat nyhetsbrev
+# ~ [2223] Nyhetsbrev - Arkiv under Mitt konto till webbaserade nyhetsbrev
+# ~ [2221] [2222] [2223] Nyhetsbrev - Länk, Token, Arkiv
 class mass_mailing(models.Model):
     _inherit = 'mail.mass_mailing'
     
@@ -49,13 +52,16 @@ class MailMail(models.Model):
         # ~ return body.replace('#website_token#', _('<a href="%s/mass_mailing/%s/%s/index.html">View Web Version</a>') %(self.env['ir.config_parameter'].get_param('web.base.url'), mail.id, mail.mass_mailing_id.token))
 
     @api.model
+    def send_get_email_dict(self, mail, partner=None):
+        record = super(MailMail, self).send_get_email_dict(mail, partner=partner)
+        # ~ _logger.warn('\n\n\n\n send_get_email_dict %s' % record)
+        return record
+
+    @api.model
     def send_get_mail_body(self, mail, partner=None):
         """ Override to add the full website version URL to the body. """
         body = super(MailMail, self).send_get_mail_body(mail, partner=partner)
-        _logger.warn('\n\n\n\n body %s' % body)
-        return body.replace('#xxxx_token#', _('<a href="%s/mass_mailing/%s/%s/index.html">View Web Version</a>') %(self.env['ir.config_parameter'].get_param('web.base.url'), mail.id, mail.mailing_id.token))
-        # ~ if mail.model != 'mail.mass_mailing.contact' and partner:
-            # ~ return body.replace('$website_consent', _('<a href="%s/mail/consent/%s/partner/%s">Click here to review this consent</a><br/>') %(self.env['ir.config_parameter'].get_param('web.base.url'), mail.mailing_id.id, partner.id))
-        # ~ else:
-            # ~ return body
+        # ~ _logger.warn('\n\n\n\n body %s' % body)
+        return body.replace('#website_token#', _('<a href="%s/mass_mailing/%s/%s/index.html">View Web Version</a>') %(self.env['ir.config_parameter'].get_param('web.base.url'), mail.id, mail.mailing_id.token))
+
 

@@ -32,7 +32,10 @@ import re
 import logging
 _logger = logging.getLogger(__name__)
 
-
+# ~ [2221] Nyhetsbrev - Länk till webbaserat nyhetsbrev
+# ~ [2222] Nyhetsbrev - Token-skydd till webbaserat nyhetsbrev
+# ~ [2223] Nyhetsbrev - Arkiv under Mitt konto till webbaserade nyhetsbrev
+# ~ [2221] [2222] [2223] Nyhetsbrev - Länk, Token, Arkiv
 class website_massmailing(http.Controller):
 
     @http.route(['/mass_mailing/<int:mail_id>/token/<token>'], type='http', auth='public', website=True)
@@ -45,7 +48,7 @@ class website_massmailing(http.Controller):
 
     @http.route(['/mass_mailing/<int:mail_stat_id>/<token>/index.html'], type='http', auth='public', website=True)
     def view_mail_stat(self, mail_stat_id, token,**post):
-        mail_mail_stats = request.env['mail.mail.statistics'].sudo().browse(mail_stat_id)
+        mail_mail_stats = request.env['mail.mail.statistics'].sudo().search([('mail_mail_id_int', '=', mail_stat_id)])
         mail_mail_stats.set_opened(mail_mail_ids=[mail_mail_stats])
 
         if token == mail_mail_stats.mass_mailing_id.token:
