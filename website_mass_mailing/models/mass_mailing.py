@@ -28,8 +28,7 @@ _logger = logging.getLogger(__name__)
 
 # ~ [2221] Nyhetsbrev - Länk till webbaserat nyhetsbrev
 # ~ [2222] Nyhetsbrev - Token-skydd till webbaserat nyhetsbrev
-# ~ [2223] Nyhetsbrev - Arkiv under Mitt konto till webbaserade nyhetsbrev
-# ~ [2221] [2222] [2223] Nyhetsbrev - Länk, Token, Arkiv
+# ~ [2221] [2222] Nyhetsbrev - Länk, Token
 class mass_mailing(models.Model):
     _inherit = 'mail.mass_mailing'
     

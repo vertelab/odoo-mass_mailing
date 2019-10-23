@@ -34,15 +34,14 @@ _logger = logging.getLogger(__name__)
 
 # ~ [2221] Nyhetsbrev - Länk till webbaserat nyhetsbrev
 # ~ [2222] Nyhetsbrev - Token-skydd till webbaserat nyhetsbrev
-# ~ [2223] Nyhetsbrev - Arkiv under Mitt konto till webbaserade nyhetsbrev
-# ~ [2221] [2222] [2223] Nyhetsbrev - Länk, Token, Arkiv
+# ~ [2221] [2222] Nyhetsbrev - Länk, Token
 class website_massmailing(http.Controller):
 
     @http.route(['/mass_mailing/<int:mail_id>/token/<token>'], type='http', auth='public', website=True)
     def view_mail_token(self, mail_id, token,**post):
         mail = request.env['mail.mass_mailing'].sudo().browse(mail_id)
         if token == mail.token:
-            return request.render('website_mass_mailing.mail', { 'mail':mail })
+            return request.render('website_mass_mailing.mail', { 'mail':mail, 'referer':post.get('referer') })
         else:
             return request.website.render('website.403', {})
 
@@ -56,7 +55,7 @@ class website_massmailing(http.Controller):
         else:
             return request.website.render('website.403', {})
 
-    @http.route('/mass_mailing/read_letter/<int:mail_mail_statistics_id>/letter.html', type='http', auth='none', website=True)
+    @http.route('/mass_mailing/read_letter/<int:mail_mail_statistics_id>/letter.html', type='http', auth='public', website=True)
     def read_letter(self, mail_mail_statistics_id, **post):
         mail_mail_stats = request.env['mail.mail.statistics'].sudo().search([('mail_mail_id_int', '=', mail_mail_statistics_id)])
         mail_mail_stats.set_opened(mail_mail_ids=[mail_mail_stats])

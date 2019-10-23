@@ -4,6 +4,7 @@
         <!-- landing page -->
         <!-- [1927] Nyhetsbrev - Funktion för att läsa nyhetsbrev när det inte fungerar i mailklienten -->
         <!-- [2221] Nyhetsbrev - Länk till webbaserat nyhetsbrev -->
+        <!-- [2223] Nyhetsbrev - Arkiv under Mitt konto till webbaserade nyhetsbrev (referer) -->
         <template id="mail" name="Mail page">
             <t t-call="website.layout">
                 <div id="email_designer" class="mb32">
@@ -15,6 +16,10 @@
                                 </div>
                             </div>
                             <div class="col-sm-6">
+                                <span><t t-esc="'/home/%s#%s' % (request.env.user.id, referer)"></span>
+                                <t t-if="referer">
+                                    <p><a t-att-href="'/home/%s#%s' % (request.env.user.id, referer)">home</a></p>
+                                </t>
                                 <div id="email_body_html" class="o_mail_body">
                                     <div t-raw="mail.body_html.replace('#website_token#', '')" />
                                 </div>
