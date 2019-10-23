@@ -16,10 +16,6 @@
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <span><t t-esc="'/home/%s#%s' % (request.env.user.id, referer)"></span>
-                                <t t-if="referer">
-                                    <p><a t-att-href="'/home/%s#%s' % (request.env.user.id, referer)">home</a></p>
-                                </t>
                                 <div id="email_body_html" class="o_mail_body">
                                     <div t-raw="mail.body_html.replace('#website_token#', '')" />
                                 </div>
