@@ -3,7 +3,7 @@
 ##############################################################################
 #
 # OpenERP, Open Source Management Solution, third party addon
-# Copyright (C) 2004-2015 Vertel AB (<http://vertel.se>).
+# Copyright (C) 2004-2020 Vertel AB (<http://vertel.se>).
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -20,23 +20,12 @@
 #
 ##############################################################################
 
-# TODO : Prune unnecessary imports
-#import base64
-#import re
-#
-#from openerp import tools
-#from openerp import SUPERUSER_ID
-from openerp.osv import osv
-#from openerp.osv import fields
-#from openerp.tools.safe_eval import safe_eval as eval
-#from openerp.tools.translate import _
-
 import logging
 from openerp import api, fields, models, tools
 
 _logger = logging.getLogger(__name__)
 
-class mail_compose_message_rr(osv.TransientModel): # Should be changable to models.TransientModel
+class mail_compose_message_rr(models.TransientModel):
     """
     Simple extension of mail.compose.message made to give more control of
     used outgoing mailservers.
@@ -51,14 +40,9 @@ class mail_compose_message_rr(osv.TransientModel): # Should be changable to mode
                                          wizard, res_ids, context=None)
         # Let default system select mail-server if given single res_id or less
         if len(res_ids) <= 1:
-            _logger.warn("MyTag:: 1 or less mails to send.")
+            _logger.debug("RR Mail: 1 or less mails to send.")
             return results
-	# else:
-
-        # Simple test logging
-        _logger.warn("MyTag:: Got here. Number of IDs: {}".format(len(res_ids)))
-        for res_id in res_ids:
-            _logger.warn("MyTag:: Got into loop. Number of ID: {}".format(res_id))
+	    # else:
         
         # Assign mail server to mail 
         mail_servers = self.env['ir.mail_server'].search([
@@ -66,11 +50,11 @@ class mail_compose_message_rr(osv.TransientModel): # Should be changable to mode
                                                    ])
         nbr_of_servers = len(mail_servers)
         curr_server_index = 0
+        _logger.info("RR Mail: Performing RR mail server selection on {} mails.".format(len(res_ids)))
         for res_id in res_ids:
             if "mail_server_id" not in results[res_id]:
                 results[res_id]["mail_server_id"] = mail_servers[curr_server_index].id
                 curr_server_index = (curr_server_index+1) %  nbr_of_servers
-                _logger.warn("MyTag:: Mail server index: {}".format(curr_server_index))
-                _logger.warn("MyTag:: Current mail server: {}".format(mail_servers[curr_server_index]))
-                _logger.warn("MyTag:: Current mail server id: {}".format(mail_servers[curr_server_index].id))          
+                _logger.debug("RR Mail: Mail server index: {}".format(curr_server_index))
+                _logger.debug("RR Mail: Current mail server id: {}".format(mail_servers[curr_server_index].id))          
         return results
