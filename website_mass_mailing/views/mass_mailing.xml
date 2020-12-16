@@ -8,6 +8,7 @@
             <field name="arch" type="xml">
                 <field name="sent_date" position="after">
                     <field name="token" />
+                    <field name="send_mail_cron" />
                 </field>
             </field>
         </record>

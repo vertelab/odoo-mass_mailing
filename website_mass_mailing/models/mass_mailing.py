@@ -31,7 +31,16 @@ _logger = logging.getLogger(__name__)
 # ~ [2221] [2222] Nyhetsbrev - Länk, Token
 class mass_mailing(models.Model):
     _inherit = 'mail.mass_mailing'
+
+    send_mail_cron = fields.Datetime(string='Send mail')
+
+    # @api.model
+    # def cron_job_mass_mailing(self)
+
     
+    #     if send_mail_cron != ""
+    #         return
+
     @api.model
     def _get_token(self):
         return  ''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(12)])
