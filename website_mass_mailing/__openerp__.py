@@ -26,6 +26,7 @@
     'category': 'Tools',
     'description': """
 * Mass mail to partners, for view i browser
+# Please check if this module can substitue - https://github.com/OCA/social/tree/11.0/mail_browser_view or https://github.com/vertelab/odoo-mail/tree/Dev-12.0/mail_browser_view
 ====================================
 """,
     'author': 'Vertel AB',
