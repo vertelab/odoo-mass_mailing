@@ -1,105 +1,53 @@
-<?xml version="1.0"?>
-<openerp>
-    <data>
-        <!--
-             <record id="view_mail_mail_statistics_search" model="ir.ui.view">
-             <field name="name">mail.mail.statistics.search</field>
-             <field name="model">mail.mail.statistics</field>
-             <field name="inherit_id" ref="mass_mailing.view_mail_mail_statistics_search"/>
-             <field name="arch" type="xml">
-             <field name="mass_mailing_id" position="after">
-             <field name="model_name" />
-             </field>
-             </field>
-             </record>
-        -->
-        <record id="view_mail_mail_statistics_tree" model="ir.ui.view">
-            <field name="name">mail.mail.statistics.tree</field>
-            <field name="model">mail.mail.statistics</field>
-            <field name="inherit_id" ref="mass_mailing.view_mail_mail_statistics_tree" />
-            <field name="arch" type="xml">
-                <field name="sent" position="before">
-                    <field name="model_record" />
-                </field>
-                <field name="message_id" position="replace" />
-                <field name="bounced" position="after">
-                    <field name="message_id" />
-                </field>
-            </field>
-        </record>
-        <record id="view_mail_mail_statistics_form" model="ir.ui.view">
-            <field name="name">mail.mail.statistics.form</field>
-            <field name="model">mail.mail.statistics</field>
-            <field name="inherit_id" ref="mass_mailing.view_mail_mail_statistics_form" />
-            <field name="arch" type="xml">
-                <field name="res_id" position="after">
-                    <field name="model_record" />
-                </field>
-            </field>
-        </record>
-        <record model="ir.ui.view" id="view_mail_mail_statistics_search">
-            <field name="name">mail.mail.statistics.search</field>
-            <field name="model">mail.mail.statistics</field>
-            <field name="inherit_id" ref="mass_mailing.view_mail_mail_statistics_search" />
-            <field name="arch" type="xml">
-                <field name="mass_mailing_id" position="after">
-                    <field name="model" />
-                    <field name="res_id" />
-                </field>
-            </field>
-        </record>
-        <!-- res.partner -->
-        <record model="ir.ui.view" id="view_partner_inherit_form">
-            <field name="name">view.partner.form.inherit</field>
-            <field name="inherit_id" ref="base.view_partner_form" />
-            <field name="model">res.partner</field>
-            <field name="arch" type="xml">
-                <!-- 2019-09-25
-                     [1878] Prestanda tester - Tar för lång tid att öppna kundkortet III
-                     <field string="Mass mail" name="mass_mail_count" widget="statinfo" />
-                -->
-                <xpath expr="//div[@name='buttons']" position="inside">
-                    <button class="oe_inline oe_stat_button" type="action" name="%(mass_mailing.action_view_mail_mail_statistics)d" context="{'search_default_model': 'res.partner', 'default_model': 'res.partner','search_default_res_id': active_id, 'default_res_id': active_id}" icon="fa-list">
-                        <div>
-                            <strong>xxxx</strong>
-                            <br />
-                            Massmail
-                        </div>
-                    </button>
-                </xpath>
-            </field>
-        </record>
-        <record id="view_mail_mass_mailing_form" model="ir.ui.view">
-            <field name="name">mail.mass_mailing.form</field>
-            <field name="model">mail.mass_mailing</field>
-            <field name="inherit_id" ref="mass_mailing.view_mail_mass_mailing_form" />
-            <field name="arch" type="xml">
-                <!--
-                     <group position="after">
-                     <group>
-                     <field name="page"/>
-                     </group>
-                     </group>
-                -->
-                <div class="oe_button_box pull-right" position="inside">
-                    <button name="%(mass_mailing.action_view_mail_mail_statistics_mailing)d" context="{'search_default_filter_visited_us': True}" type="action" class="oe_stat_button">
-                        <field name="visited_us_ratio" string="Visited Us" widget="percentpie" />
-                    </button>
-                </div>
-            </field>
-        </record>
-        <record model="ir.ui.view" id="view_mail_mail_statistics_search">
-            <field name="name">mail.mail.statistics.search.inherit</field>
-            <field name="model">mail.mail.statistics</field>
-            <field name="inherit_id" ref="mass_mailing.view_mail_mail_statistics_search" />
-            <field name="arch" type="xml">
-                <filter string="Replied" position="after">
-                    <filter string="Visited" name="filter_visited_us" domain="[('visited_us', '!=', False)]" />
-                </filter>
-                <group string="Group By" position="inside">
-                    <filter string="Visited Us" name="group_visited_us" context="{'group_by': 'visited_us:day'}" />
-                </group>
-            </field>
-        </record>
-    </data>
-</openerp>
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="view_mail_mass_mailing_form">
+      <field name="name">mail.mass_mailing.form</field>
+      <field name="model">mail.mass_mailing</field>
+      <field name="inherit_id" ref="mass_mailing.view_mail_mass_mailing_form"/>
+      <field name="arch" type="xml">
+	<xpath expr="//notebook" position="inside">
+	  <page string="Next Activity" name="campaign_flow"  attrs="{'invisible': [('mass_mailing_campaign_id', '=', False)]}">
+		  <group>
+		    <group>
+                      <field name="activity_type" widget="radio" options="{'horizontal': true}"/>
+		     
+                      <field name="mass_mailing_id" 
+                            domain="[('id', '!=', id)]" 
+                            context="{'default_mass_mailing_campaign_id': mass_mailing_campaign_id}"  
+                            attrs="{'required': [('activity_type', '=', 'email')], 'invisible': [('activity_type', '!=', 'email')]}"/>
+                      <field name="server_action_id" attrs="{'required': [('activity_type', '=', 'action')], 'invisible': [('activity_type', '!=', 'action')]}"/>
+                      
+		    </group>
+		    <group attrs="{'invisible': [('activity_type', '=', 'none')]}">
+                      <label for="interval_number" string="Perform"/>
+                      <div>
+			<field name="interval_number" class="oe_inline"/>
+			<field name="interval_type" class="oe_inline ml4"/>
+			<span class="ml8">after</span>
+                      </div>
+                      <label for="trigger_type" class="d-none"/>
+                      <div>
+			<field name="trigger_type"/>
+                      </div>
+                      
+                      
+                      <label for="validity_duration"/>
+                      <div>
+			<field name="validity_duration"/>
+                      </div>
+                      <label for="validity_duration_number" string="Valid during" attrs="{'invisible': [('validity_duration', '=', False)]}"/>
+                      <div attrs="{'invisible': [('validity_duration', '=', False)]}">
+			<field name="validity_duration_number" class="oe_inline"/>
+			<field name="validity_duration_type" class="oe_inline"/>
+                      </div>
+		    </group>
+		  </group>
+		  
+
+              
+	  </page>
+	</xpath>
+      </field>
+    </record>
+  </data>
+</odoo>

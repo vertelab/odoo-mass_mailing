@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-# OpenERP, Open Source Management Solution, third party addon
+# Odoo, Open Source Management Solution, third party addon
 # Copyright (C) 2004-2017 Vertel AB (<http://vertel.se>).
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,8 @@
     'version': '1.0',
     'category': 'Tools',
     'description': """
-* Link directly to res.partner (or other object) from statistics
+(* Link directly to res.partner (or other object) from statistics
+* Controller to read the mail from website)
 * Extra trigger functionality
 ====================================
 """,
