@@ -26,6 +26,7 @@
     'category': 'Tools',
     'description': """
 * Link directly to res.partner (or other object) from statistics
+* Extra trigger functionality
 ====================================
 """,
     'author': 'Vertel AB',
@@ -33,7 +34,7 @@
     'website': 'https://vertel.se',
     'depends': ['mass_mailing', 'website'],
     'data': [
-        'mass_mailing.xml',
+        'views/mass_mailing.xml',
     ],
     'installable': True,
     'auto_install': False,
