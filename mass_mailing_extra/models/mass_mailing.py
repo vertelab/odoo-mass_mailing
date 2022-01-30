@@ -18,6 +18,9 @@ class MassMailingCampain(models.Model):
      model_name = fields.Char(string='Model Name', related='model_id.model', readonly=True, store=True)
      mailing_activity_ids = fields.Many2many(comodel_name='mail.mass_mailing')
 
+    def execute_triggers(self):
+        for campaign in self:
+            campaign.mailing_activity_ids.execute()
 
 
 class MassMailing(models.Model):
