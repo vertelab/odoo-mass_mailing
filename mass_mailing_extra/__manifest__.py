@@ -34,7 +34,7 @@
     'website': 'https://vertel.se',
     'depends': ['mass_mailing', 'website'],
     'data': [
-        'data/mass_mailing.xml',
+        # ~ 'data/mass_mailing.xml',
         'views/mass_mailing.xml',
     ],
     'installable': True,
