@@ -32,7 +32,7 @@ _logger = logging.getLogger(__name__)
 
 
 class MailMailStats(models.Model):
-    _inherit = "mail.mail.statistics"
+    _inherit = "mailing.trace"
 
     @api.onchange('model','res_id')
     def _model_change(self):
@@ -68,14 +68,14 @@ class MailMailStats(models.Model):
         return stat_ids
 
 class MassMailing(models.Model):
-    _inherit = 'mail.mass_mailing'
+    _inherit = 'mailing.mailing'
 
     # ~ page = fields.Many2one(comodel_name='ir.ui.view', string='Page')
 
     @api.one
     def _visited_us(self):
-        self.visited_us = self.env['mail.mail.statistics'].search_count([('visited_us', '!=', False)])
-        statistics_count = self.env['mail.mail.statistics'].search_count([])
+        self.visited_us = self.env['mailing.trace'].search_count([('visited_us', '!=', False)])
+        statistics_count = self.env['mailing.trace'].search_count([])
         if statistics_count != 0:
             self.visited_us_ratio = self.visited_us / statistics_count * 100.0
         else:
@@ -89,7 +89,7 @@ class res_partner(models.Model):
 
     @api.one
     def _mass_mail_count(self):
-        self.mass_mail_count = self.env['mail.mail.statistics'].search_count([('res_id','=',self.id),('model','=','res.partner')])
+        self.mass_mail_count = self.env['mailing.trace'].search_count([('res_id','=',self.id),('model','=','res.partner')])
     mass_mail_count = fields.Integer(compute="_mass_mail_count")
 
 
@@ -107,9 +107,9 @@ class massMailRead(http.Controller):
 
     @http.route('/mail/read_letter/<int:mail_mail_statistics_id>/letter.html', type='http', auth='none', website=True)
     def read_letter(self, mail_mail_statistics_id, **post):
-        mail_mail_stats = request.env['mail.mail.statistics'].sudo().search([('mail_mail_id_int', '=', mail_mail_statistics_id)])
+        mail_mail_stats = request.env['mailing.trace'].sudo().search([('mail_mail_id_int', '=', mail_mail_statistics_id)])
         mail_mail_stats.set_opened(mail_mail_ids=[mail_mail_stats])
-        template_data = request.env['email.template'].sudo().render_template(mail_mail_stats.mass_mailing_id.body_html, 'mail.mail.statistics', mail_mail_stats.id) #(template, model, record.id)
+        template_data = request.env['email.template'].sudo().render_template(mail_mail_stats.mass_mailing_id.body_html, 'mailing.trace', mail_mail_stats.id) #(template, model, record.id)
         response = werkzeug.wrappers.Response()
         response.mimetype = 'text/html'
         response.data = '''<!doctype html>
@@ -129,7 +129,7 @@ class massMailRead(http.Controller):
 
     @http.route('/mail/page/<int:mail_mail_statistics_id>/index.html', type='http', auth='none', website=True)
     def read_page(self, mail_mail_statistics_id, **post):
-        mail_mail_stats = request.env['mail.mail.statistics'].sudo().search([('mail_mail_id_int', '=', mail_mail_statistics_id)])
+        mail_mail_stats = request.env['mailing.trace'].sudo().search([('mail_mail_id_int', '=', mail_mail_statistics_id)])
         mail_mail_stats.visited_us = fields.Datetime.now()
         return mail_mail_stats.mass_mailing_id.body_html.replace('$website_url', '')
         # ~ mail_mail_stats.set_page_read(mail_mail_ids=[mail_mail_stats])
