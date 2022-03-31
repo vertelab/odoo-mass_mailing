@@ -36,6 +36,6 @@
         'crm_lead_view.xml',
     ],
     'installable': True,
-    'auto_install': True,
+    'auto_install': False,#IF YOU DISAGREE THAT THIS MODULE SHOULD BE AUTO INSTALLED, THEN FIX IT.
 }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
