@@ -23,7 +23,7 @@
 {
     'name': 'Mass Mail Extra features',
     'version': '1.0',
-    'category': 'Tools',
+    'category': 'Administration',
     'description': """
 (* Link directly to res.partner (or other object) from statistics
 * Controller to read the mail from website)
