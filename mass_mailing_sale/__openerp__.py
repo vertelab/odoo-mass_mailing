@@ -21,7 +21,7 @@
 {
     'name': 'Mass Mail Sale',
     'version': '1.0',
-    'category': 'Tools',
+    'category': 'Administration',
     'description': """
 Add sale order list in mailing model
 ====================================
