@@ -23,7 +23,7 @@
 {
     'name': 'Mass Mailing Unsanitized HTML',
     'version': '1.0',
-    'category': 'git config --global --add safe.directory /usr/share/odoo-mass_mailing',
+    'category': 'Administration',
     'description': """
 Unsanitized html tags in mass_mailing
 =====================================
