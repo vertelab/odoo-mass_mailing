@@ -23,7 +23,7 @@
 {
     'name': 'Mass Mail CRM features',
     'version': '1.0',
-    'category': 'Tools',
+    'category': 'Administration',
     'description': """
 * Link directly to mass mail statistics from crm.lead
 ====================================
