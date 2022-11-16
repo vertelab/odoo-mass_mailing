@@ -33,9 +33,10 @@ _logger = logging.getLogger(__name__)
 
 class MailMailStats(models.Model):
     _inherit = "mailing.trace"
-
+    
     @api.onchange('model','res_id')
     def _model_change(self):
+        _logger.warning(f"model change {self.res_id}")
         if self.model and self.res_id and self.env[self.model].browse(self.res_id):
             self.model_record = self.env[self.model].browse(self.res_id)
 
@@ -45,8 +46,10 @@ class MailMailStats(models.Model):
         #~ return [(m.model, m.name) for m in self.env['ir.model'].search([])] + [('', '')]
     #~ id_object = fields.Selection(selection='_select_objects',string='Model',)
 
-
     def _model_record(self):
+        self.ensure_one()
+        _logger.warning(f"model record res_id: {self.res_id}")
+        _logger.warning(f"model record model: {self.model}")
         if self.model and self.res_id and self.env[self.model].browse(self.res_id):
             self.model_record = self.env[self.model].browse(self.res_id)
 
@@ -57,13 +60,17 @@ class MailMailStats(models.Model):
         return [(model.model, model.name)
                 for model in models
                 if not model.model.startswith('ir.')]
+    
     model_record = fields.Reference(string="Record",selection="_reference_models",compute="_model_record")
-    visited_us = fields.Datetime(string='Visited Us', help='Date when email receiver visite our site first time')
+    visited_us_stat = fields.Datetime(string='Visited Us', help='Date when email receiver visit our site first time')
 
     def set_page_read(self, mail_mail_ids=None, mail_message_ids=None): #method that calculate who visited our page
+        self.ensure_one()
         stat_ids = self._get_ids(self, mail_mail_ids, mail_message_ids, [('visited_us', '=', False)])
+        _logger.warning(f"set page read stat_ids: {stat_ids}")
         self.write(self, stat_ids, {'visited_us': fields.datetime.now()})
         return stat_ids
+
 
 class MassMailing(models.Model):
     _inherit = 'mailing.mailing'
@@ -71,12 +78,14 @@ class MassMailing(models.Model):
     # ~ page = fields.Many2one(comodel_name='ir.ui.view', string='Page')
 
     def _visited_us(self):
-        self.visited_us = self.env['mailing.trace'].search_count([('visited_us', '!=', False)])
-        statistics_count = self.env['mailing.trace'].search_count([])
+        self.ensure_one()
+        self.visited_us = self.env['mailing.trace'].search([('visited_us', '!=', False)])
+        statistics_count = self.env['mailing.trace'].search([])
         if statistics_count != 0:
             self.visited_us_ratio = self.visited_us / statistics_count * 100.0
         else:
             self.visited_us_ratio = 0
+    
     visited_us = fields.Integer(string='Visited Us', compute='_visited_us')
     visited_us_ratio = fields.Integer(string='Visited Ratio', compute='_visited_us')
 
@@ -85,7 +94,9 @@ class res_partner(models.Model):
     _inherit = "res.partner"
 
     def _mass_mail_count(self):
-        self.mass_mail_count = self.env['mailing.trace'].search_count([('res_id','=',self.id),('model','=','res.partner')])
+        self.ensure_one()
+        self.mass_mail_count = self.env['mailing.trace'].search([('res_id','=', self.ids)])
+    
     mass_mail_count = fields.Integer(compute="_mass_mail_count")
 
 
@@ -104,6 +115,7 @@ class massMailRead(http.Controller):
     @http.route('/mail/read_letter/<int:mail_mail_statistics_id>/letter.html', type='http', auth='none', website=True)
     def read_letter(self, mail_mail_statistics_id, **post):
         mail_mail_stats = request.env['mailing.trace'].sudo().search([('mail_mail_id_int', '=', mail_mail_statistics_id)])
+        _logger.warning("{mail_mail_stats}")
         mail_mail_stats.set_opened(mail_mail_ids=[mail_mail_stats])
         template_data = request.env['email.template'].sudo().render_template(mail_mail_stats.mass_mailing_id.body_html, 'mailing.trace', mail_mail_stats.id) #(template, model, record.id)
         response = werkzeug.wrappers.Response()
@@ -116,7 +128,7 @@ class massMailRead(http.Controller):
                 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
             </head>
             <body>
-        ''' + template_data + '''
+                ''' + template_data + '''
                 <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"/>
             </body>
         </html>
