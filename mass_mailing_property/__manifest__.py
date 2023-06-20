@@ -18,33 +18,33 @@
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-# ~ [1927] Nyhetsbrev - Funktion för att läsa nyhetsbrev när det inte fungerar i mailklienten
 
 {
-    'name': 'Mass Mailing: Website Mailing',
-    'version': '14.0.0.0.0',
+    'name': 'Mass Mailing: Property Glue',
+    'version': '16.0.0.0.0',
     # Version ledger: 14.0 = Odoo version. 1 = Major. Non regressionable code. 2 = Minor. New features that are regressionable. 3 = Bug fixes
-    'summary': 'Mass mail to partners, for view i browser',
-    'category': 'Administration',
+    'summary': ' Glue module between odoo_property and mass_mailing.',
+    # Categories can be used to filter modules in modules listing
+    # Check https://github.com/odoo/odoo/blob/14.0/odoo/addons/base/data/ir_module_category_data.xml
+    # for the full list
+    'category': 'Sales',
     'description': """
-* Mass mail to partners, for view i browser
-# Please check if this module can substitue - https://github.com/OCA/social/tree/11.0/mail_browser_view or https://github.com/vertelab/odoo-mail/tree/Dev-12.0/mail_browser_view
-====================================
-""",
+        Glue module between odoo_property and mass_mailing.
+    """,
     #'sequence': '1',
     'author': 'Vertel AB',
-    'website': 'https://vertel.se/apps/odoo-mass_mailing/website_mass_mailing',
+    'website': 'https://vertel.se/apps/odoo-mass_mailing/mass_mailing_property',
     'images': ['static/description/banner.png'], # 560x280 px.
     'license': 'AGPL-3',
     'contributor': '',
     'maintainer': 'Vertel AB',
     'repository': 'https://github.com/vertelab/odoo-mass_mailing',
-    'depends': ['mass_mailing','website'],
+    # Any module necessary for this one to work correctly
+    
+    'depends': ['mass_mailing', 'property_mgmt'],
     'data': [
-        'views/template.xml',
-        'views/mass_mailing.xml',
     ],
+    'application': False,
     'installable': True,
-    'auto_install': True,
 }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
