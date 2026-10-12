@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Campaign -->
+    <record id="marketing_campaign_view_kanban" model="ir.ui.view">
+        <field name="name">marketing.campaign.view.kanban</field>
+        <field name="model">marketing.campaign</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" quick_create="false" sample="0">
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <span class="o_ma_campaign_header text-primary text-truncate" t-att-title="record.name.raw_value">
+                            <field name="name"/>
+                        </span>
+                        <div class="d-flex text-uppercase text-center mt8">
+                            <div class="d-flex flex-column flex-grow-1 text-muted">
+                                <span>Total</span>
+                                <field name="total_participant_count" class="fw-bolder mt4 h2"/>
+                            </div>
+                            <div class="d-flex flex-column flex-grow-1 text-primary">
+                                <span>Running</span>
+                                <field name="running_participant_count" class="fw-bolder mt4 h2"/>
+                            </div>
+                            <div class="d-flex flex-column flex-grow-1 text-primary">
+                                <span>Completed</span>
+                                <field name="completed_participant_count" class="fw-bolder mt4 h2"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="marketing_campaign_view_form" model="ir.ui.view">
+        <field name="name">marketing.campaign.view.form</field>
+        <field name="model">marketing.campaign</field>
+        <field name="arch" type="xml">
+            <form string="Campaign">
+                <header invisible="not active">
+                    <button name="action_start_campaign" type="object" class="btn-primary" string="Start" invisible="state == 'running' or not active"/>
+                    <button name="action_stop_campaign" type="object" invisible="state != 'running'" class="btn-primary" string="Stop"/>
+                    <button name="sync_participants" type="object" invisible="state != 'running'" class="btn-secondary" string="Generate participants" groups="base.group_no_one"
+                            confirm="Are you sure you want to create a new participant for each matching record that has not been used yet?"
+                            confirm-title="Generate Participants" confirm-label="Generate Participants"/>
+                    <button name="execute_activities" type="object" invisible="state != 'running'" class="btn-secondary" string="Run" groups="base.group_no_one"
+                            confirm="Run the next scheduled activity for each participant of this campaign?"
+                            confirm-title="Run Activities" confirm-label="Run"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,running,stopped"/>
+                </header>
+                <field name="require_sync" invisible="1"/>
+                <div class="text-center alert alert-primary" role="alert" invisible="not require_sync">
+                    <div class="h4 mt8"><strong>The workflow has been modified!</strong></div>
+                    <p>Some participants are already running on this campaign. Click on 'Update' to apply the modifications you've just made.</p>
+                    <p class="mb8">
+                        <button name="action_update_participants" type="object" class="btn btn-primary" string="Update"/>
+                        <button name="action_set_synchronized" type="object" class="btn btn-secondary ml8" string="Don't update"/>
+                    </p>
+                </div>
+                <sheet>
+                    <div name="button_box" class="oe_button_box">
+                        <button name="action_view_mailings" type="object" icon="fa-envelope-o" class="oe_stat_button" invisible="mass_mailing_count == 0">
+                            <field name="mass_mailing_count" widget="statinfo" string="Templates"/>
+                        </button>
+                        <button name="%(marketing_participant_action_campaign_test)d" type="action" icon="fa-flask" class="oe_stat_button" invisible="test_participant_count == 0">
+                            <field name="test_participant_count" widget="statinfo" string="Tests"/>
+                        </button>
+                        <button name="%(marketing_participant_action_campaign)d" type="action" icon="fa-code-fork fa-rotate-180 fa-flip-vertical" class="oe_stat_button"
+                                invisible="total_participant_count == 0 and state == 'draft'">
+                            <field name="total_participant_count" widget="statinfo" string="Participants"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <h1><field class="text-break" name="title" required="1" placeholder="e.g. eCommerce Offers Plan"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" invisible="1"/>
+                            <field name="user_id" groups="base.group_no_one" widget="many2one_avatar_user" class="oe_inline"/>
+                            <field name="model_id" readonly="state != 'draft'" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="model_name" invisible="1"/>
+                            <field name="unique_field_id" string="Unicity based on " options="{'no_create': True, 'no_open': True}"/>
+                        </group>
+                        <group>
+                            <field name="active" invisible="1"/>
+                            <field name="utm_campaign_id" required="0" invisible="1"/>
+                            <field name="reenrollment_policy"/>
+                            <field name="reenrollment_delay" invisible="reenrollment_policy != 'after_delay'"/>
+                            <field name="reenrollment_delay_type" invisible="reenrollment_policy != 'after_delay'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="domain" widget="domain" options="{'foldable': True, 'model': 'model_name'}"/>
+                        <field name="goal_domain" widget="domain" options="{'foldable': True, 'model': 'model_name'}"/>
+                    </group>
+                    <notebook>
+                        <page string="Workflow" name="workflow">
+                            <field name="marketing_activity_ids" nolabel="1"
+                                   context="{'default_campaign_id': id, 'default_model_id': model_id, 'default_utm_campaign_id': utm_campaign_id}">
+                                <list editable="bottom" default_order="interval_standardized">
+                                    <field name="interval_standardized" column_invisible="True"/>
+                                    <field name="name"/>
+                                    <field name="activity_type"/>
+                                    <field name="trigger_type"/>
+                                    <field name="parent_id" domain="[('id', 'in', allowed_parent_ids)]"/>
+                                    <field name="interval_number"/>
+                                    <field name="interval_type"/>
+                                    <field name="processed"/>
+                                    <field name="rejected"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="marketing_campaign_view_list" model="ir.ui.view">
+        <field name="name">marketing.campaign.view.list</field>
+        <field name="model">marketing.campaign</field>
+        <field name="arch" type="xml">
+            <list string="Campaign" sample="1">
+                <field name="name"/>
+                <field name="model_id" string="Target" readonly="state != 'draft'"/>
+                <field name="mass_mailing_count" string="Mailings"/>
+                <field name="total_participant_count" string="Participants"/>
+                <field name="state" readonly="True" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'running'"
+                       decoration-muted="state == 'stopped'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="marketing_campaign_view_search" model="ir.ui.view">
+        <field name="name">marketing.campaign.view.search</field>
+        <field name="model">marketing.campaign</field>
+        <field name="arch" type="xml">
+            <search string="Search Campaign">
+                <field name="name" string="Campaign"/>
+                <field name="model_id" string="Target"/>
+                <filter string="New" name="new" domain="[('state', '=', 'draft')]"/>
+                <filter string="Running" name="running" domain="[('state', '=', 'running')]"/>
+                <filter string="Stopped" name="stopped" domain="[('state', '=', 'stopped')]"/>
+                <separator/>
+                <filter string="Archived" name="archived" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="group_by_model_id" string="Target" context="{'group_by': 'model_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="marketing_campaign_action" model="ir.actions.act_window">
+        <field name="name">Campaigns</field>
+        <field name="path">marketing-automation</field>
+        <field name="res_model">marketing.campaign</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a Campaign</p>
+            <p>Build a flow of activities and let the campaign run it for you.</p>
+        </field>
+    </record>
+
+    <menuitem id="marketing_campaign_menu" name="Campaigns"
+              parent="marketing_automation_menu"
+              action="marketing_campaign_action"
+              sequence="1"/>
+
+</odoo>

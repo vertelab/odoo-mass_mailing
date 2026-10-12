@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="mailing_mailing_view_list_marketing_automation" model="ir.ui.view">
+        <field name="name">mailing.mailing.view.list.marketing.automation</field>
+        <field name="model">mailing.mailing</field>
+        <field name="inherit_id" ref="mass_mailing.view_mail_mass_mailing_tree"/>
+        <field name="mode">primary</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='subject']" position="after">
+                <field name="marketing_activity_ids" string="Activities" widget="many2many_tags"/>
+            </xpath>
+            <xpath expr="//list/field[@name='state']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="mailing_mailing_view_form_marketing_automation" model="ir.ui.view">
+        <field name="name">mailing.mailing.view.form.marketing.automation</field>
+        <field name="model">mailing.mailing</field>
+        <field name="inherit_id" ref="mass_mailing.view_mail_mass_mailing_form"/>
+        <field name="mode">primary</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@class='o_mass_mailing_mailing_group']/field[@name='subject']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_launch']" position="replace"/>
+            <xpath expr="//button[@name='action_schedule']" position="replace"/>
+            <xpath expr="//field[@name='source_id']" position="after">
+                <field name="marketing_activity_ids" string="Activities" widget="many2many_tags" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="mail_mass_mailing_action_marketing_automation" model="ir.actions.act_window">
+        <field name="name">Marketing Automation Mailings</field>
+        <field name="res_model">mailing.mailing</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('use_in_marketing_automation', '=', True)]</field>
+    </record>
+
+    <record id="mail_mass_mailing_action_marketing_automation_list" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">list</field>
+        <field name="act_window_id" ref="mail_mass_mailing_action_marketing_automation"/>
+        <field name="view_id" ref="mailing_mailing_view_list_marketing_automation"/>
+    </record>
+
+    <record id="mail_mass_mailing_action_marketing_automation_form" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">form</field>
+        <field name="act_window_id" ref="mail_mass_mailing_action_marketing_automation"/>
+        <field name="view_id" ref="mailing_mailing_view_form_marketing_automation"/>
+    </record>
+
+</odoo>

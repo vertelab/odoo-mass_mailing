@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!--
+        Campaign template prerequisites: server actions and mailings reused
+        across template instantiations. They carry stable xmlids so that
+        selecting the same template twice reuses them instead of creating
+        duplicates.
+    -->
+
+    <!-- Tag Hot Contacts: add the "Hot" category to partners who clicked. -->
+    <record id="res_partner_category_tag_hot" model="res.partner.category">
+        <field name="name">Hot</field>
+    </record>
+
+    <record id="ir_actions_server_partner_tag" model="ir.actions.server">
+        <field name="name">Add Hot Category</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">object_write</field>
+        <field name="update_path">category_id</field>
+        <field name="evaluation_type">value</field>
+        <field name="resource_ref" eval="'res.partner.category,%s' % ref('res_partner_category_tag_hot')"/>
+    </record>
+
+    <record id="ir_actions_server_partner_todo" model="ir.actions.server">
+        <field name="name">Next activity: Check Email Address</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">next_activity</field>
+        <field name="activity_date_deadline_range">2</field>
+        <field name="activity_date_deadline_range_type">days</field>
+        <field name="activity_summary">Check Email Address</field>
+        <field name="activity_type_id" ref="mail.mail_activity_data_todo"/>
+        <field name="activity_user_type">generic</field>
+        <field name="activity_user_field_name">user_id</field>
+    </record>
+
+    <!-- Welcome Flow: blacklist bounced contacts. -->
+    <record id="ir_actions_server_contact_blacklist" model="ir.actions.server">
+        <field name="name">Blacklist record</field>
+        <field name="model_id" ref="mass_mailing.model_mailing_contact"/>
+        <field name="state">code</field>
+        <field name="code">
+for record in records:
+    record.env['mail.blacklist']._add(
+        record.email,
+        message='Added in blacklist from automated action',
+    )
+        </field>
+    </record>
+
+    <!-- Double Opt-in: add a clicking contact to the confirmed list. -->
+    <record id="mailing_list_contact_list" model="mailing.list">
+        <field name="name">Confirmed contacts</field>
+        <field name="active" eval="True"/>
+        <field name="is_public" eval="True"/>
+    </record>
+
+    <record id="ir_actions_server_contact_add_list" model="ir.actions.server">
+        <field name="name">Add To Confirmed List</field>
+        <field name="model_id" ref="mass_mailing.model_mailing_contact"/>
+        <field name="state">code</field>
+        <field name="code">
+mailing_list = env.ref('marketing_automation_ce.mailing_list_contact_list', raise_if_not_found=False)
+if mailing_list:
+    records.write({'list_ids': [(4, mailing_list.id)]})
+        </field>
+    </record>
+
+    <!-- Commercial prospection: notify the sales person of a reply. -->
+    <record id="ir_actions_server_partner_message" model="ir.actions.server">
+        <field name="name">Message for sales person</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code">
+for record in records:
+    record.message_post(body='%s is interested in becoming partner.' % record.name)
+        </field>
+    </record>
+
+</odoo>
