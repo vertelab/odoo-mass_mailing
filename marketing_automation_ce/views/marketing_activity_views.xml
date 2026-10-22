@@ -13,6 +13,8 @@
                     </div>
                     <group>
                         <group>
+                            <field name="campaign_id"
+                                   options="{'no_create': True, 'no_open': False}"/>
                             <field name="activity_type" widget="radio" options="{'horizontal': true}"/>
                             <label for="mass_mailing_id" string="Mail Template" invisible="activity_type != 'email'"/>
                             <field name="mass_mailing_id"

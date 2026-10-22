@@ -248,6 +248,25 @@ class MarketingCampaign(models.Model):
         self.mapped('marketing_activity_ids').write({'require_sync': False})
         return True
 
+    def _recompute_goals(self):
+        """Re-evaluate ``goal_met`` on every trace of these campaigns.
+
+        ``goal_met`` is a stored compute that reads the participant's target
+        record through a domain. Odoo cannot declare a dependency on fields
+        of a model that is only known at runtime, so the value has to be
+        recomputed explicitly after the target records may have changed —
+        which is what the synchronisation cron does before it executes
+        activities, so that a participant who converted in the meantime is
+        skipped rather than mailed again.
+        """
+        traces = self.env['marketing.trace'].search([
+            ('participant_id.campaign_id', 'in', self.ids),
+        ])
+        if traces:
+            traces._compute_goal_met()
+            traces.flush_recordset(['goal_met'])
+        return True
+
     def action_view_mailings(self):
         self.ensure_one()
         action = self.env['ir.actions.actions']._for_xml_id(
@@ -318,6 +337,28 @@ class MarketingCampaign(models.Model):
             to_create = [rid for rid in db_ids if rid not in existing_ids]
             to_remove = set(existing_ids) - set(db_ids)
 
+            # Re-enrollment: a record whose participant is completed may
+            # re-enter the flow, provided the campaign's policy allows it
+            # (``once`` never, ``after_delay`` after the delay). The old
+            # participant is unlinked so the record can be created afresh.
+            if campaign.reenrollment_policy != 'never':
+                completed = self.env['marketing.participant'].search([
+                    ('campaign_id', '=', campaign.id),
+                    ('res_id', 'in', db_ids),
+                    ('state', '=', 'completed'),
+                ])
+                reenroll_ids = []
+                for participant in completed:
+                    if campaign._reenrollment_allows(
+                            campaign, participant.res_id, participant):
+                        reenroll_ids.append(participant.res_id)
+                if reenroll_ids:
+                    self.env['marketing.participant'].search([
+                        ('campaign_id', '=', campaign.id),
+                        ('res_id', 'in', reenroll_ids),
+                    ]).action_set_unlink()
+                    to_create = _uniquify(to_create + reenroll_ids)
+
             # Uniqueness filtering on the chosen field.
             unique_field = campaign.unique_field_id.sudo()
             if unique_field and unique_field.name != 'id':
@@ -337,23 +378,6 @@ class MarketingCampaign(models.Model):
                         without_duplicates.append(rec.id)
                         unique_values.add(field_val)
                 to_create = without_duplicates
-
-            # Re-enrollment: records that already have a completed
-            # participant may re-enter only if the policy allows it.
-            if campaign.reenrollment_policy != 'never' and to_create:
-                completed = self.env['marketing.participant'].search([
-                    ('campaign_id', '=', campaign.id),
-                    ('res_id', 'in', to_create),
-                    ('state', '=', 'completed'),
-                ])
-                blocked = set()
-                for participant in completed:
-                    if not campaign._reenrollment_allows(
-                            campaign, participant.res_id, participant):
-                        blocked.add(participant.res_id)
-                if blocked:
-                    to_create = [rid for rid in to_create
-                                 if rid not in blocked]
 
             batch_size = 100
             for batch in tools.split_every(batch_size, to_create,
@@ -383,6 +407,11 @@ class MarketingCampaign(models.Model):
     def execute_activities(self):
         """Execute every scheduled activity whose deadline has passed."""
         for campaign in self:
+            # The goal is evaluated against the participant's target record,
+            # which may have changed since the last run. Refresh it first so
+            # that a participant who converted in the meantime is skipped.
+            if campaign.goal_domain:
+                campaign._recompute_goals()
             campaign.marketing_activity_ids.execute()
         return True
 

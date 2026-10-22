@@ -462,6 +462,20 @@ class MarketingActivity(models.Model):
         now = fields.Datetime.now()
         new_traces = self.env['marketing.trace']
 
+        # Goal: a participant whose record already matches the campaign's
+        # goal domain must not receive this activity at all. The goal is
+        # evaluated here, before the payload runs, so that a step is never
+        # sent to a record that already converted. This is deliberately a
+        # skip and not an error: the flow ends for that participant.
+        if self.campaign_id.goal_domain:
+            goal_traces = traces.filtered('goal_met')
+            if goal_traces:
+                goal_traces.action_cancel(message=_('Goal reached'))
+                goal_traces.mapped('participant_id').action_set_completed()
+                traces = traces - goal_traces
+            if not traces:
+                return new_traces
+
         # Validity window: cancel traces that are past their validity.
         if self.validity_duration:
             duration = relativedelta(**{
@@ -661,9 +675,16 @@ class MarketingActivity(models.Model):
             traces.action_cancel(message=_('Other condition branch taken'))
 
     def _generate_children_traces(self, traces):
-        """Create child traces for the time-dependent child activities."""
+        """Create child traces for the time-dependent child activities.
+
+        Steps that hang off a *branch* of this activity are excluded: they are
+        only reachable through ``_generate_branch_traces`` once the condition
+        has been evaluated. Creating them here would put both branches of a
+        condition in flight at once.
+        """
         child_traces = self.env['marketing.trace']
-        for activity in self.child_ids:
+        branch_children = self.true_child_ids | self.false_child_ids
+        for activity in self.child_ids - branch_children:
             offset = relativedelta(**{
                 activity.interval_type: activity.interval_number})
             for trace in traces:
